@@ -34,62 +34,63 @@
  * @copyright  Copyright (c) 2009 - 2011 PHPWord (http://www.codeplex.com/PHPWord)
  */
 class PHPWord_Template {
-    
+
     /**
      * ZipArchive
-     * 
+     *
      * @var ZipArchive
      */
     private $_objZip;
-    
+
     /**
      * Temporary Filename
-     * 
+     *
      * @var string
      */
     private $_tempFileName;
-    
+
     /**
      * Document XML
-     * 
+     *
      * @var string
      */
     private $_documentXML;
-    
-    
+
+
     /**
      * Create a new Template Object
-     * 
+     *
      * @param string $strFilename
      */
     public function __construct($strFilename) {
         $path = dirname($strFilename);
         $this->_tempFileName = $path.DIRECTORY_SEPARATOR.time().'.docx';
-        
+
         copy($strFilename, $this->_tempFileName); // Copy the source File to the temp File
 
         $this->_objZip = new ZipArchive();
         $this->_objZip->open($this->_tempFileName);
-        
+
         $this->_documentXML = $this->_objZip->getFromName('word/document.xml');
     }
-    
+
     /**
      * Set a Template value
-     * 
+     *
      * @param mixed $search
      * @param mixed $replace
+     * @param bool  $utf8_encode
      */
-    public function setValue($search, $replace) {
+    public function setValue($search, $replace, $utf8_encode = FALSE) {
         if(substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
             $search = '${'.$search.'}';
         }
-        
-        if(!is_array($replace)) {
+
+        if(!is_array($replace) AND $utf8_encode !== FALSE) {
             $replace = utf8_encode($replace);
         }
-        
-        $this->_documentXML = str_replace($search, $replace, $this->_documentXML);
+
+	    $this->_documentXML = str_replace($search, $replace, $this->_documentXML);
     }
     /**
      * Returns array of all variables in template
@@ -101,21 +102,21 @@ class PHPWord_Template {
     }
     /**
      * Save Template
-     * 
+     *
      * @param string $strFilename
      */
     public function save($strFilename) {
         if(file_exists($strFilename)) {
             unlink($strFilename);
         }
-        
+
         $this->_objZip->addFromString('word/document.xml', $this->_documentXML);
-        
+
         // Close zip file
         if($this->_objZip->close() === false) {
             throw new Exception('Could not close zip file.');
         }
-        
+
         rename($this->_tempFileName, $strFilename);
     }
 }
