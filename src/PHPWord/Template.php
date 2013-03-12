@@ -92,10 +92,6 @@ class PHPWord_Template {
 			$this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
 		}
         
-        if(!is_array($replace)) {
-            $replace = utf8_encode($replace);
-        }
-        
         $this->_documentXML = str_replace($search, $replace, $this->_documentXML);
     }
     /**
