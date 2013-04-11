@@ -62,6 +62,20 @@ class PHPWord_Style_Paragraph {
 	 * @var int
 	 */
 	private $_spacing;
+
+    /**
+     * Left Margin
+     *
+     * @var int
+     */
+	private $_leftMargin;
+
+    /**
+     * Right Margin
+     *
+     * @var int
+     */
+	private $_rightMargin;
 	
 	
 	/**
@@ -72,6 +86,48 @@ class PHPWord_Style_Paragraph {
 		$this->_spaceBefore     = null;
 		$this->_spaceAfter      = null;
 		$this->_spacing         = null;
+		$this->_leftMargin      = null;
+		$this->_rightMargin     = null;
+	}
+
+	/**
+	 * Get left margin
+	 * 
+	 * @return int
+	 */
+	public function getLeftMargin() {
+		return $this->_leftMargin;
+	}
+
+	/**
+	 * Set left margin
+	 * 
+	 * @param int $pValue
+	 * @return PHPWord_Style_Paragraph
+	 */
+	public function setLeftMargin($pValue = null) {
+	   $this->_leftMargin = $pValue;
+	   return $this;
+	}
+
+	/**
+	 * Get Right margin
+	 * 
+	 * @return int
+	 */
+	public function getRightMargin() {
+		return $this->_rightMargin;
+	}
+
+	/**
+	 * Set right margin
+	 * 
+	 * @param int $pValue
+	 * @return PHPWord_Style_Paragraph
+	 */
+	public function setRightMargin($pValue = null) {
+	   $this->_rightMargin = $pValue;
+	   return $this;
 	}
 	
 	/**

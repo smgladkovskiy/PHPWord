@@ -114,11 +114,24 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 		$spaceAfter = $style->getSpaceAfter();
 		$spacing = $style->getSpacing();
 
+		// 2013 04 11
+        $leftMargin = $style->getLeftMargin();
+        $rightMargin = $style->getRightMargin();
 
-		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter)) {
+
+		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($leftMargin) || !is_null($rightMargin)) {
 
             if(!$withoutPPR) {
                 $objWriter->startElement('w:pPr');
+            }
+
+            // 2013 04 11
+            if( !is_null($leftMargin) || !is_null($rightMargin) ) {
+            	// <w:ind w:left="-1417" w:right="-1417"/>
+        		$objWriter->startElement('w:ind');
+        			if(!is_null($leftMargin)) { $objWriter->writeAttribute('w:left', $leftMargin); }
+        			if(!is_null($rightMargin)) { $objWriter->writeAttribute('w:right', $rightMargin); }
+        		$objWriter->endElement();
             }
 
 			if(!is_null($align)) {
