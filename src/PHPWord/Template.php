@@ -58,6 +58,27 @@ class PHPWord_Template
     private $_documentXML;
 
     /**
+     * Tables from document XML
+     * @var array
+     */
+    private $_tables;
+    
+    public function getDocumentXML()
+    {
+        return $this->_documentXML;
+    }
+
+    public function setDocumentXML($documentXML)
+    {
+        $this->_documentXML = $documentXML;
+    }
+
+    public function getTables()
+    {
+        return $this->_tables;
+    }
+    
+    /**
      * Create a new Template Object
      * 
      * @param string $strFilename
@@ -76,6 +97,21 @@ class PHPWord_Template
         $this->_documentXML = $this->_objZip->getFromName('word/document.xml');
     }
 
+    /**
+     * Set Template values
+     * 
+     * @param mixed $values
+     */
+    public function setValues($values)
+    {
+        Utils::convertArrayDataToISO($values);
+
+        foreach ($values as $key => $value)
+        {
+            $this->setValue($key, $value);
+        }
+    }
+    
     /**
      * Set a Template value
      * 
@@ -98,8 +134,62 @@ class PHPWord_Template
     }
 
     /**
+     * Retrieve all tabs from XML
+     */
+    public function getTablesFromXML()
+    {
+        $results = array();
+        $offset = 0;
+        while (($start = strpos($this->_documentXML, '<w:tbl>', $offset)) !== false)
+        {
+            $offset = $start + 7;
+
+            $end = strpos($this->_documentXML, '</w:tbl>', $offset) + 8;
+
+            $offset = $end + 8;
+
+            $tab = substr($this->_documentXML, $start, ($end - $start));
+
+            $results[0][] = $tab;
+        }
+        $this->_tables = $results;
+    }
+
+    /**
+     * Insert a list of xml tables into document
+     * @param array $xmlTables
+     */
+    public function insertXMLTables(array $xmlTables)
+    {
+        foreach ($xmlTables as $id => $xmlTable)
+        {
+            $this->insertXMLTable($id, $xmlTable);
+        }
+    }
+
+    /**
+     * Replace ${tag} by specified xml table
+     * @param string $tag
+     * @param string $xml
+     */
+    public function insertXMLTable($tag, $xml)
+    {
+        $this->_documentXML = preg_replace('/<w:p(\s+[^>]+)*>(?:(?!<\/w:p>).)*' . $tag . '}.*?<\/w:p>/', $xml, $this->_documentXML);
+    }
+
+    /**
+     * Replace image by $path/$imageName
+     * @param string $path
+     * @param string $imageName
+     */
+    public function replaceImage($path, $imageName)
+    {
+        $this->_objZip->deleteName('word/media/' . $imageName);
+        $this->_objZip->addFile($path, 'word/media/' . $imageName);
+    }
+
+    /**
      * Save Template
-     * 
      * @param string $strFilename
      */
     public function save($strFilename)
@@ -119,94 +209,12 @@ class PHPWord_Template
 
         rename($this->_tempFileName, $strFilename);
     }
-
-    private $_tabs;
-
-    public function getDocumentXML()
-    {
-        return $this->_documentXML;
-    }
-
-    public function setDocumentXML($documentXML)
-    {
-        $this->_documentXML = $documentXML;
-    }
-
-    public function getTabs()
-    {
-        return $this->_tabs;
-    }
-
-    /**
-     * Retrieve all tabs from XML
-     */
-    public function getTabsFromXML()
-    {
-        $results = array();
-        $offset = 0;
-        while (($start = strpos($this->_documentXML, '<w:tbl>', $offset)) !== false)
-        {
-            $offset = $start + 7;
-
-            $end = strpos($this->_documentXML, '</w:tbl>', $offset) + 8;
-
-            $offset = $end + 8;
-
-            $tab = substr($this->_documentXML, $start, ($end - $start));
-
-            $results[0][] = $tab;
-        }
-        $this->_tabs = $results;
-    }
-
-    /**
-     * Insert a list of xml tables into document
-     * @param array $xmlTables
-     */
-    public function insertXMLTables(array $xmlTables)
-    {
-        foreach ($xmlTables as $id => $xmlTable)
-        {
-            $this->insertXMLTab($id, $xmlTable);
-        }
-    }
-
-    /**
-     * Replace ${tag} by specified xml table
-     * @param string $tag
-     * @param string $xml
-     */
-    public function insertXMLTab($tag, $xml)
-    {
-        $this->_documentXML = preg_replace('/<w:p(\s+[^>]+)*>(?:(?!<\/w:p>).)*' . $tag . '}.*?<\/w:p>/', $xml, $this->_documentXML);
-    }
-
-    public function setValues($values)
-    {
-        Utils::convertArrayDataToISO($values);
-
-        foreach ($values as $key => $value)
-        {
-            $this->setValue($key, $value);
-        }
-    }
-
-    /**
-     * Replace image by $path/$imageName
-     * @param string $path
-     * @param string $imageName
-     */
-    public function replaceImage($path, $imageName)
-    {
-        $this->_objZip->deleteName('word/media/' . $imageName);
-        $this->_objZip->addFile($path, 'word/media/' . $imageName);
-    }
-
+    
     /**
      * Get document's content as string
      * @return content of document
      */
-    public function getDocument()
+    public function get()
     {
         if (is_file($this->_tempFileName))
         {
