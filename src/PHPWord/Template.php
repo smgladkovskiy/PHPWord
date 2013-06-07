@@ -89,7 +89,14 @@ class PHPWord_Template {
         if($encode && !is_array($replace)) {
             $replace = utf8_encode($replace);
         }
-        
+
+        preg_match_all('/\$[^\$]+?}/', $this->_documentXML, $matches);
+
+        for ($i=0;$i<count($matches[0]);$i++) {
+            $matches_new[$i] = preg_replace('/(<[^<]+?>)/','', $matches[0][$i]);
+            $this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
+        }
+
         $this->_documentXML = str_replace($search, $replace, $this->_documentXML);
     }
     /**
