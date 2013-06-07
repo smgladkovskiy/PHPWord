@@ -126,5 +126,31 @@ class PHPWord_Template {
         
         rename($this->_tempFileName, $strFilename);
     }
+
+    /**
+     * Clone a table row
+     * @see http://jeroen.is/phpword-templates-with-repeating-rows/
+     *
+     * @param mixed $search
+     * @param mixed $numberOfClones
+     */
+    public function cloneRow($search, $numberOfClones) {
+        if(substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
+            $search = '${'.$search.'}';
+        }
+
+        $tagPos 	 = strpos($this->_documentXML, $search);
+        $rowStartPos = strrpos($this->_documentXML, "<w:tr", ((strlen($this->_documentXML) - $tagPos) * -1));
+        $rowEndPos   = strpos($this->_documentXML, "</w:tr>", $tagPos) + 7;
+
+        $result = substr($this->_documentXML, 0, $rowStartPos);
+        $xmlRow = substr($this->_documentXML, $rowStartPos, ($rowEndPos - $rowStartPos));
+        for ($i = 1; $i <= $numberOfClones; $i++) {
+            $result .= preg_replace('/\$\{(.*?)\}/','\${\\1#'.$i.'}', $xmlRow);
+        }
+        $result .= substr($this->_documentXML, $rowEndPos);
+
+        $this->_documentXML = $result;
+    }
 }
 ?>
