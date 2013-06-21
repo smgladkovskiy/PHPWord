@@ -87,6 +87,13 @@ class PHPWord_Style_Paragraph {
 	
 	
 	/**
+	 * Set of Custom Tab Stops
+	 *
+	 * @var array
+	 */
+	private $_tabs;
+
+	/**
 	 * New Paragraph Style
 	 */
 	public function __construct() {
@@ -97,6 +104,7 @@ class PHPWord_Style_Paragraph {
 		$this->_indent          = null;
 		$this->_leftMargin      = null;
 		$this->_rightMargin     = null;
+		$this->_tabs            = null;
 	}
 
 	/**
@@ -148,6 +156,8 @@ class PHPWord_Style_Paragraph {
 	public function setStyleValue($key, $value) {
 		if($key == '_spacing') {
 			$value += 240; // because line height of 1 matches 240 twips
+		} else if($key === '_tabs') {
+			$value = new PHPWord_Style_Tabs($value);
 		}
 		if($key == '_indent') {
             $value = (int)$value * 720; // 720 twips per indent
@@ -257,6 +267,14 @@ class PHPWord_Style_Paragraph {
 	public function setIndent($pValue = null) {
 	   $this->_indent = $pValue;
 	   return $this;
+	}
+
+	/**
+	 *
+	 * @return PHPWord_Style_Tabs
+	 */
+	public function getTabs() {
+		return $this->_tabs;
 	}
 }
 ?>

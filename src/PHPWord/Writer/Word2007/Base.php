@@ -115,15 +115,16 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 		$spaceBefore = $style->getSpaceBefore();
 		$spaceAfter = $style->getSpaceAfter();
 		$spacing = $style->getSpacing();
+		$tabs = $style->getTabs();
 		$indent = $style->getIndent();
 		
         
-		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($indent)) {
 
 		// 2013 04 11
         $leftMargin = $style->getLeftMargin();
         $rightMargin = $style->getRightMargin();
 
+		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($indent)) {
 
 		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($leftMargin) || !is_null($rightMargin)) {
 
@@ -169,6 +170,10 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 					}
 
 				$objWriter->endElement();
+			}
+
+			if(!is_null($tabs)) {
+				$tabs->toXml($objWriter);
 			}
 
             if(!$withoutPPR) {
