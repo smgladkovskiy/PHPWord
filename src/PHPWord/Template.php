@@ -38,21 +38,21 @@ class PHPWord_Template
 
     /**
      * ZipArchive
-     * 
+     *
      * @var ZipArchive
      */
     private $_objZip;
 
     /**
      * Temporary Filename
-     * 
+     *
      * @var string
      */
     private $_tempFileName;
 
     /**
      * Document XML
-     * 
+     *
      * @var string
      */
     private $_documentXML;
@@ -80,7 +80,7 @@ class PHPWord_Template
     
     /**
      * Create a new Template Object
-     * 
+     *
      * @param string $strFilename
      */
     public function __construct($strFilename)
@@ -114,12 +114,12 @@ class PHPWord_Template
     
     /**
      * Set a Template value
-     * 
+     *
      * @param mixed $search
      * @param mixed $replace
-     * @param boolean $encode
+     * @param boolean $utf8_encode
      */
-    public function setValue($search, $replace, $encode = false) {
+    public function setValue($search, $replace, $utf8_encode = FALSE) {
         if(substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
             $search = '${'.$search.'}';
         }
@@ -131,7 +131,7 @@ class PHPWord_Template
 			$this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
 		}
         
-        if($encode && !is_array($replace)) {
+        if(!is_array($replace) AND $utf8_encode !== FALSE) {
             $replace = utf8_encode($replace);
         }
 
