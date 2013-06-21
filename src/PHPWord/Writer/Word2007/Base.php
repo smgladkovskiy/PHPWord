@@ -397,6 +397,20 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 			$objWriter->writeElement('w:strike', null);
 		}
 
+		// Subscript
+		if($subscript) {
+			$objWriter->startElement('w:vertAlign');
+				$objWriter->writeAttribute('w:val', 'subscript');
+			$objWriter->endElement();
+		}
+		
+		// Superscript
+		if($superscript) {
+			$objWriter->startElement('w:vertAlign');
+				$objWriter->writeAttribute('w:val', 'superscript');
+			$objWriter->endElement();
+		}
+		
 		// Foreground-Color
 		if(!is_null($fgColor)) {
 			$objWriter->startElement('w:highlight');
