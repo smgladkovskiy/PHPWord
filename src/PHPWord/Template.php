@@ -123,6 +123,13 @@ class PHPWord_Template
         if(substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
             $search = '${'.$search.'}';
         }
+		
+		preg_match_all('/\$[^\$]+?}/', $this->_documentXML, $matches);
+		
+		for ($i = 0; $i < count($matches[0]); $i++) {
+			$matches_new[$i] = preg_replace('/(<[^<]+?>)/', '', $matches[0][$i]);
+			$this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
+		}
         
         if($encode && !is_array($replace)) {
             $replace = utf8_encode($replace);
