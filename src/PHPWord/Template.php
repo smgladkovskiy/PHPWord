@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPWord
  *
@@ -25,7 +26,6 @@
  * @version    Beta 0.6.3, 08.07.2011
  */
 
-
 /**
  * PHPWord_DocumentProperties
  *
@@ -33,45 +33,83 @@
  * @package    PHPWord
  * @copyright  Copyright (c) 2009 - 2011 PHPWord (http://www.codeplex.com/PHPWord)
  */
-class PHPWord_Template {
-    
+class PHPWord_Template
+{
+
     /**
      * ZipArchive
      * 
      * @var ZipArchive
      */
     private $_objZip;
-    
+
     /**
      * Temporary Filename
      * 
      * @var string
      */
     private $_tempFileName;
-    
+
     /**
      * Document XML
      * 
      * @var string
      */
     private $_documentXML;
+
+    /**
+     * Tables from document XML
+     * @var array
+     */
+    private $_tables;
     
+    public function getDocumentXML()
+    {
+        return $this->_documentXML;
+    }
+
+    public function setDocumentXML($documentXML)
+    {
+        $this->_documentXML = $documentXML;
+    }
+
+    public function getTables()
+    {
+        return $this->_tables;
+    }
     
     /**
      * Create a new Template Object
      * 
      * @param string $strFilename
      */
-    public function __construct($strFilename) {
+    public function __construct($strFilename)
+    {
         $path = dirname($strFilename);
-        $this->_tempFileName = $path.DIRECTORY_SEPARATOR.time().'.docx';
-        
+        //$this->_tempFileName = $path . DIRECTORY_SEPARATOR . time() . '.docx';
+        $this->_tempFileName = $path . DIRECTORY_SEPARATOR . microtime() . '.docx';
+
         copy($strFilename, $this->_tempFileName); // Copy the source File to the temp File
 
         $this->_objZip = new ZipArchive();
         $this->_objZip->open($this->_tempFileName);
-        
+
         $this->_documentXML = $this->_objZip->getFromName('word/document.xml');
+    }
+
+    /**
+     * Set Template values
+     * 
+     * @param mixed $values
+     */
+    public function setValues($values)
+    {
+        Utils::convertArrayDataToISO($values);
+
+        foreach ($values as $key => $value)
+        {
+            $this->setValue($key, $value);
+        }
     }
     
     /**
@@ -99,31 +137,81 @@ class PHPWord_Template {
 
         $this->_documentXML = str_replace($search, $replace, $this->_documentXML);
     }
+
     /**
-     * Returns array of all variables in template
+     * Retrieve all tabs from XML
      */
-    public function getVariables()
+    public function getTablesFromXML()
     {
-        preg_match_all('/\$\{(.*?)}/i', $this->_documentXML, $matches);
-        return $matches[1];
+        $results = array();
+        $offset = 0;
+        while (($start = strpos($this->_documentXML, '<w:tbl>', $offset)) !== false)
+        {
+            $offset = $start + 7;
+
+            $end = strpos($this->_documentXML, '</w:tbl>', $offset) + 8;
+
+            $offset = $end + 8;
+
+            $tab = substr($this->_documentXML, $start, ($end - $start));
+
+            $results[0][] = $tab;
+        }
+        $this->_tables = $results;
     }
+
+    /**
+     * Insert a list of xml tables into document
+     * @param array $xmlTables
+     */
+    public function insertXMLTables(array $xmlTables)
+    {
+        foreach ($xmlTables as $id => $xmlTable)
+        {
+            $this->insertXMLTable($id, $xmlTable);
+        }
+    }
+
+    /**
+     * Replace ${tag} by specified xml table
+     * @param string $tag
+     * @param string $xml
+     */
+    public function insertXMLTable($tag, $xml)
+    {
+        $this->_documentXML = preg_replace('/<w:p(\s+[^>]+)*>(?:(?!<\/w:p>).)*' . $tag . '}.*?<\/w:p>/', $xml, $this->_documentXML);
+    }
+
+    /**
+     * Replace image by $path/$imageName
+     * @param string $path
+     * @param string $imageName
+     */
+    public function replaceImage($path, $imageName)
+    {
+        $this->_objZip->deleteName('word/media/' . $imageName);
+        $this->_objZip->addFile($path, 'word/media/' . $imageName);
+    }
+
     /**
      * Save Template
-     * 
      * @param string $strFilename
      */
-    public function save($strFilename) {
-        if(file_exists($strFilename)) {
+    public function save($strFilename)
+    {
+        if (file_exists($strFilename))
+        {
             unlink($strFilename);
         }
-        
+
         $this->_objZip->addFromString('word/document.xml', $this->_documentXML);
-        
+
         // Close zip file
-        if($this->_objZip->close() === false) {
+        if ($this->_objZip->close() === false)
+        {
             throw new Exception('Could not close zip file.');
         }
-        
+
         rename($this->_tempFileName, $strFilename);
     }
 
@@ -152,5 +240,35 @@ class PHPWord_Template {
 
         $this->_documentXML = $result;
     }
+    
+    /**
+     * Get document's content as string
+     * @return content of document
+     */
+    public function get()
+    {
+        if (is_file($this->_tempFileName))
+        {
+            //add document
+            $this->_objZip->addFromString('word/document.xml', $this->_documentXML);
+
+            // Close zip file
+            $this->_objZip->close();
+
+            return file_get_contents($this->_tempFileName);
+        }
+    }
+
+    /**
+     * Destruct temp file if exists
+     */
+    function __destruct()
+    {
+        if (is_file($this->_tempFileName))
+        {
+            unlink($this->_tempFileName);
+        }
+    }
+
 }
 ?>
