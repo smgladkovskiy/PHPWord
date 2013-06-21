@@ -120,7 +120,17 @@ class PHPWord_Template
      * @param boolean $utf8_encode
      */
     public function setValue($search, $replace, $utf8_encode = FALSE) {
-        if(substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
+        $pattern = '|\$\{([^\}]+)\}|U';
+        preg_match_all($pattern, $this->_documentXML, $matches);
+        $openedTagPattern = '/<[^>]+>/';
+        $closedTagPattern = '/<\/[^>]+>/';
+        foreach ($matches[0] as $value) {
+            $modificado = preg_replace($openedTagPattern, '', $value);
+            $modificado = preg_replace($closedTagPattern, '', $modificado);
+            $this->_documentXML = str_replace($value, $modificado, $this->_documentXML);
+        }
+
+        if (substr($search, 0, 1) !== '${' && substr($search, -1) !== '}') {
             $search = '${'.$search.'}';
         }
 		
