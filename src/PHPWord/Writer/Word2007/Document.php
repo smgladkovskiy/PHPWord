@@ -89,6 +89,8 @@ class PHPWord_Writer_Word2007_Document extends PHPWord_Writer_Word2007_Base {
 						$this->_writeObject($objWriter, $element);
 					} elseif($element instanceof PHPWord_TOC) {
 						$this->_writeTOC($objWriter);
+					} elseif($element instanceof PHPWord_Section_Footnote) {
+                      $this->_writeFootnoteReference($objWriter, $element);
 					}
 				}
 				
@@ -232,7 +234,7 @@ class PHPWord_Writer_Word2007_Document extends PHPWord_Writer_Word2007_Base {
 		$objWriter->endElement();
 	}
 	
-	private function _writeListItem(PHPWord_Shared_XMLWriter $objWriter = null, PHPWord_Section_ListItem $listItem) {
+	protected function _writeListItem(PHPWord_Shared_XMLWriter $objWriter = null, PHPWord_Section_ListItem $listItem) {
 		$textObject = $listItem->getTextObject();
 		$text = $textObject->getText();
         $styleParagraph = $textObject->getParagraphStyle();
