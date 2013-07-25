@@ -117,46 +117,48 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 		$spacing = $style->getSpacing();
 		$tabs = $style->getTabs();
 		$indent = $style->getIndent();
-		
-        
 
 		// 2013 04 11
-        $leftMargin = $style->getLeftMargin();
-        $rightMargin = $style->getRightMargin();
+		$leftMargin = $style->getLeftMargin();
+		$rightMargin = $style->getRightMargin();
 
 		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($indent)) {
 
-		if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($leftMargin) || !is_null($rightMargin)) {
+			if(!is_null($align) || !is_null($spacing) || !is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($leftMargin) || !is_null($rightMargin)) {
 
-            if(!$withoutPPR) {
-                $objWriter->startElement('w:pPr');
-            }
+				if(!$withoutPPR) {
+					$objWriter->startElement('w:pPr');
+				}
 
-            // 2013 04 11
-            if( !is_null($leftMargin) || !is_null($rightMargin) ) {
-            	// <w:ind w:left="-1417" w:right="-1417"/>
-        		$objWriter->startElement('w:ind');
-        			if(!is_null($leftMargin)) { $objWriter->writeAttribute('w:left', $leftMargin); }
-        			if(!is_null($rightMargin)) { $objWriter->writeAttribute('w:right', $rightMargin); }
-        		$objWriter->endElement();
-            }
+				// 2013 04 11
+				if( !is_null($leftMargin) || !is_null($rightMargin) ) {
+					// <w:ind w:left="-1417" w:right="-1417"/>
+					$objWriter->startElement('w:ind');
+					if(!is_null($leftMargin)) {
+						$objWriter->writeAttribute('w:left', $leftMargin);
+					}
+					if(!is_null($rightMargin)) {
+						$objWriter->writeAttribute('w:right', $rightMargin);
+					}
+					$objWriter->endElement();
+				}
 
-			if(!is_null($align)) {
-				$objWriter->startElement('w:jc');
+				if(!is_null($align)) {
+					$objWriter->startElement('w:jc');
 					$objWriter->writeAttribute('w:val', $align);
-				$objWriter->endElement();
-			}
+					$objWriter->endElement();
+				}
 
-			if(!is_null($indent)) {
-				$objWriter->startElement('w:ind');
+				if(!is_null($indent)) {
+					$objWriter->startElement('w:ind');
 					$objWriter->writeAttribute('w:firstLine', 0);
 					$objWriter->writeAttribute('w:left', $indent);
-				$objWriter->endElement();
-			}
+					$objWriter->endElement();
+				}
 
-			if(!is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($spacing)) {
+				if(!is_null($spaceBefore) || !is_null($spaceAfter) || !is_null($spacing)) {
 
-				$objWriter->startElement('w:spacing');
+					$objWriter->startElement('w:spacing');
 
 					if(!is_null($spaceBefore)) {
 						$objWriter->writeAttribute('w:before', $spaceBefore);
@@ -169,16 +171,17 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 						$objWriter->writeAttribute('w:lineRule', 'auto');
 					}
 
-				$objWriter->endElement();
-			}
+					$objWriter->endElement();
+				}
 
-			if(!is_null($tabs)) {
-				$tabs->toXml($objWriter);
-			}
+				if(!is_null($tabs)) {
+					$tabs->toXml($objWriter);
+				}
 
-            if(!$withoutPPR) {
-			    $objWriter->endElement(); // w:pPr
-            }
+				if(!$withoutPPR) {
+					$objWriter->endElement(); // w:pPr
+				}
+			}
 		}
 	}
 
@@ -408,14 +411,14 @@ class PHPWord_Writer_Word2007_Base extends PHPWord_Writer_Word2007_WriterPart {
 				$objWriter->writeAttribute('w:val', 'subscript');
 			$objWriter->endElement();
 		}
-		
+
 		// Superscript
 		if($superscript) {
 			$objWriter->startElement('w:vertAlign');
 				$objWriter->writeAttribute('w:val', 'superscript');
 			$objWriter->endElement();
 		}
-		
+
 		// Foreground-Color
 		if(!is_null($fgColor)) {
 			$objWriter->startElement('w:highlight');
