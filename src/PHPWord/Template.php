@@ -62,7 +62,7 @@ class PHPWord_Template
      * @var array
      */
     private $_tables;
-    
+
     public function getDocumentXML()
     {
         return $this->_documentXML;
@@ -77,7 +77,7 @@ class PHPWord_Template
     {
         return $this->_tables;
     }
-    
+
     /**
      * Create a new Template Object
      *
@@ -99,7 +99,7 @@ class PHPWord_Template
 
     /**
      * Set Template values
-     * 
+     *
      * @param mixed $values
      */
     public function setValues($values)
@@ -111,7 +111,7 @@ class PHPWord_Template
             $this->setValue($key, $value);
         }
     }
-    
+
     /**
      * Set a Template value
      *
@@ -133,22 +133,23 @@ class PHPWord_Template
         if (substr($search, 0, 1) !== '${' && substr($search, -1) !== '}') {
             $search = '${'.$search.'}';
         }
-		
+
 		preg_match_all('/\$[^\$]+?}/', $this->_documentXML, $matches);
-		
+
 		for ($i = 0; $i < count($matches[0]); $i++) {
 			$matches_new[$i] = preg_replace('/(<[^<]+?>)/', '', $matches[0][$i]);
 			$this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
 		}
-        
+
         if(!is_array($replace) AND $utf8_encode !== FALSE) {
             $replace = utf8_encode($replace);
         }
 
+        // Deletes xml-tags inside ${} - Source: http://phpword.codeplex.com/discussions/268012
         preg_match_all('/\$[^\$]+?}/', $this->_documentXML, $matches);
 
-        for ($i=0;$i<count($matches[0]);$i++) {
-            $matches_new[$i] = preg_replace('/(<[^<]+?>)/','', $matches[0][$i]);
+        for ($i = 0; $i < count($matches[0]); $i++) {
+            $matches_new[$i] = preg_replace('/(<[^<]+?>)/', '', $matches[0][$i]);
             $this->_documentXML = str_replace($matches[0][$i], $matches_new[$i], $this->_documentXML);
         }
 
@@ -257,7 +258,7 @@ class PHPWord_Template
 
         $this->_documentXML = $result;
     }
-    
+
     /**
      * Get document's content as string
      * @return content of document
